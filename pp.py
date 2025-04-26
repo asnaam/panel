@@ -1,6 +1,16 @@
 import json
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
+import subprocess
+
+# Fungsi untuk cek uptime server
+async def uptime(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        result = subprocess.check_output(['uptime', '-p']).decode('utf-8')
+        await update.message.reply_text(f"Uptime server: {result.strip()}")
+    except Exception as e:
+        await update.message.reply_text(f"Gagal ambil uptime server: {str(e)}")
+
 
 BOT_TOKEN = "8136762541:AAHoXifsCDi0Ny3-yovirnTRPfIIPmr1ZtU"
 SALDO_FILE = "saldo.json"
@@ -248,6 +258,7 @@ def main():
     app.add_handler(CommandHandler("add", add_saldo))
     app.add_handler(CommandHandler("kurangi", kurangi_saldo))
     app.add_handler(CallbackQueryHandler(button_click))
+    app.add_handler(CommandHandler("uptime", uptime))
 
     print("\033[92mBOT BERHASIL DI JALANKAN.\033[0m")
     app.run_polling()
